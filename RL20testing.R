@@ -2,6 +2,15 @@
 ########## RL + Bayesian version of LM #########
 ########## with imputation for missing #########
 ################################################
+cor_index = commandArgs(trailingOnly = TRUE)
+
+if (length(cor_index) != 1)
+  stop("Provide only one index")
+
+cor_index = as.integer(cor_index)
+
+stopifnot(!is.na(cor_index))
+
 library(mvtnorm)
 # prior
 beta0 <- beta1 <- c(3:1,3:1,1,1)
@@ -97,8 +106,8 @@ gen_data <- function(my_rho=0.9){
   return(list(fileA,fileB))
 }
 
-fileA = gen_data(0.9)[[1]]
-fileB = gen_data(0.9)[[2]]
+fileA = gen_data(cor_index)[[1]]
+fileB = gen_data(cor_index)[[2]]
 
 # shuffle file A and file B
 # fileA <- fileA[sample(dim(fileA)[1]),]
@@ -234,11 +243,16 @@ rtruncbeta <- function(alpha=2,beta=500,a=.5,iter=100){
 iter <- 5000
 
 # store the results
-Z_09_imp <- matrix(NA,length(Znew),iter)
-u_09_imp <- matrix(NA,nBetaPriors,iter)
-m_09_imp <- matrix(NA,nBetaPriors,iter)
-betas_09_imp <- matrix(NA,2,iter)
-sigmas_09_imp <- rep(NA,iter)
+assign(paste("Z_",cor_index,"_imp",sep=""),matrix(NA,length(Znew),iter))
+# Z_09_imp <- matrix(NA,length(Znew),iter)
+assign(paste("u_",cor_index,"_imp",sep=""),matrix(NA,nBetaPriors,iter))
+# u_09_imp <- matrix(NA,nBetaPriors,iter)
+assign(paste("m_",cor_index,"_imp",sep=""),matrix(NA,nBetaPriors,iter))
+# m_09_imp <- matrix(NA,nBetaPriors,iter)
+assign(paste("betas_",cor_index,"_imp",sep=""),matrix(NA,2,iter))
+# betas_09_imp <- matrix(NA,2,iter)
+assign(paste("sigma_",cor_index,"_imp",sep=""),rep(NA,iter))
+# sigmas_09_imp <- rep(NA,iter)
 
 for (i in 1:iter){
   print(i)
@@ -388,10 +402,15 @@ for (i in 1:iter){
     from = from + n1
   }
   
-  Z_09_imp[,i] <- Znew 
-  m_09_imp[,i] <- mnew 
-  u_09_imp[,i] <- unew
-  betas_09_imp[,i] <- new_beta
-  sigmas_09_imp[i] <- new_sigma
+  assign(paste("Z_",cor_index,"_imp[,",i,"]",sep=""), Znew) 
+  assign(paste("m_",cor_index,"_imp[,",i,"]",sep=""), mnew)
+  assign(paste("u_",cor_index,"_imp[,",i,"]",sep=""), unew)
+  assign(paste("betas_",cor_index,"_imp[,",i,"]",sep=""), new_beta)
+  assign(paste("sigma_",cor_index,"_imp[,",i,"]",sep=""), new_sigma)
 }
-save(Z_09_imp, m_09_imp, u_09_imp,betas_09_imp,sigmas_09_imp,file = "RL20_09.RData")
+save(list = c(paste("Z_",cor_index,"_imp",sep=""), 
+     paste("m_",cor_index,"_imp",sep=""),
+     paste("u_",cor_index,"_imp",sep=""),
+     paste("betas_",cor_index,"_imp",sep=""),
+     paste("sigma_",cor_index,"_imp",sep="")),
+     file = paste("RL20_",cor_index,".RData",sep=""))
