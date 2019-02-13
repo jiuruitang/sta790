@@ -413,4 +413,4 @@ save(list = c(paste("Z_",cor_index,"_imp",sep=""),
      paste("u_",cor_index,"_imp",sep=""),
      paste("betas_",cor_index,"_imp",sep=""),
      paste("sigma_",cor_index,"_imp",sep="")),
-     file = paste("RL20_",cor_index,".RData",sep=""))
+     file = paste("RL20_",gsub("[.]","",as.character(cor_index)),".RData",sep=""))
