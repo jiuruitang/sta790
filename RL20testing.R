@@ -7,7 +7,7 @@ cor_index = commandArgs(trailingOnly = TRUE)
 if (length(cor_index) != 1)
   stop("Provide only one index")
 
-cor_index = as.integer(cor_index)
+cor_index = as.numeric(cor_index)
 
 stopifnot(!is.na(cor_index))
 
